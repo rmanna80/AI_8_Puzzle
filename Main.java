@@ -21,7 +21,12 @@ class Main{
     public testAll(){
         rightError = moveRight(currentState);
     string userInput = input("enter a 9 digit number using digits 0-8 only once");
-        if len(user_input) != 9
+        //ensures the input is 9 digits and each digit is used only once
+       while (len(userInput) != 9){
+           userInput = input("must be 9 digits");
+       }
+
+        
     
     array[] currentState = userInput
     array goalState1 = [1,1];
