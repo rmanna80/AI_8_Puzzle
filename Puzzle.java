@@ -1,4 +1,4 @@
-import java.awt.Taskbar.State;
+import java.util.Collections;
 import java.util.*;
 
 public class Puzzle {
@@ -152,6 +152,138 @@ public class Puzzle {
         }
 
         return moves;
+
+    }
+
+    // this method will calculate the heuristic (Manhattan distance) for the A*
+
+    private int calculateSumOfError(int[][] board) {
+
+        int heurisitic = 0;
+
+        // calculate the Manhattan Distance for each tile
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                int value = board[i][j];
+
+                if (value != 0) {
+
+                    int targetX = (value - 1) / 3; // Target is the row for this value
+                    int targetY = (value - 1) % 3; // Target is the column for this value
+                    heurisitic += Math.abs(i - targetX) + Math.abs(j - targetY); // this is the sum of the verticle and
+                                                                                 // horizontial values
+
+                }
+            }
+        }
+
+        return heurisitic;
+
+    }
+
+    // print the solution oath that is from the start state to the goal state
+    private void printSolution(State goalState) {
+
+        List<int[][]> path = new ArrayList<>();
+        State current = goalState;
+
+        // backtrack from the goal state to the start state
+        while (current != null) {
+
+            path.add(current.board);
+            current = current.parent;
+
+        }
+
+        // reverse the path from the start to the goal
+        Collections.reverse(path);
+        System.out.println("Solution Path: ");
+        for (int[][] board : path) {
+
+            printBoard(board);
+            System.out.println();
+
+        }
+
+        System.out.println("Number of takin steps: " + (path.size() - 1)); // this shows the numbers of steps required
+
+    }
+
+    // healper method to print the board
+    private void printBoard(int[][] board) {
+
+        for (int[] row : board) {
+            for (int value : row) {
+                System.out.println(value + "");
+            }
+
+            System.out.println();
+        }
+
+    }
+
+    // create a copy of the 2D array
+    private int[][] deepCopy(int[][] original) {
+
+        int[][] copy = new int[original.length][];
+        for (int i = 0; i < original.length; i++) {
+
+            copy[i] = original[i].clone();
+
+        }
+
+        return copy;
+
+    }
+
+}
+
+// this class represents each state of the puzzle
+class State {
+
+    int[][] board; // represents the puzzle board
+    int g; // cost to reach this state from the start
+    int h; // heuristic cost
+    State parent; // this is a refrence to the parent state to track the solution path
+
+    // constructor
+    State(int[][] baord, int g, int h) {
+
+        this.board = baord;
+        this.g = g;
+        this.h = h;
+
+    }
+
+    // have a construictor for the parent refrences
+    State(int[][] baord, int g, int h, State parent) {
+
+        this.board = baord;
+        this.g = g;
+        this.h = h;
+        this.parent = parent;
+
+    }
+
+    // get the total cost ( g + h) for the A*
+    int getCost() {
+
+        return g + h;
+
+    }
+
+    // override the equals and hashcode to use the State
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        State state = (State) obj;
+        return Arrays.deepEquals(board, state.board);
 
     }
 
