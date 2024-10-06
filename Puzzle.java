@@ -1,3 +1,4 @@
+
 import java.util.Collections;
 import java.util.*;
 
@@ -13,6 +14,9 @@ public class Puzzle {
     private int[][] currentState; // stores the current puzzle state
     private PriorityQueue<State> openList; // List of satets to be explored ( the PQ for A*)
     private Set<State> closedList; // set of already explored states
+    private int nodesExpanded = 0;
+    private int nodesGenerated = 0;
+    private boolean useManhattan = true;
 
     // constructor to initialize the PQ and the HashSet
     public Puzzle() {
@@ -29,7 +33,8 @@ public class Puzzle {
         currentState = new int[3][3]; // initalize the 3x3 board
 
         System.out.println("Enter the start state in a (3x3 grid, seperated with space from numbers 0-8)");
-        System.out.println("Example:\n 2 3 4\n1 5 6\n 8 7 0");
+        System.out.println("Example:\n2 3 4\n1 5 6\n8 7 0");
+        System.out.println();
 
         // read the user input to generate the start state
         for (int i = 0; i < 3; i++) {
@@ -39,6 +44,9 @@ public class Puzzle {
 
             }
         }
+        System.out.println("Eneter '1' to use the Manhattan Distance or '2' to use Misplaced tiles heuristic ");
+        int choice = scanner.nextInt();
+        useManhattan = (choice == 1); // if the input is '1' then use manhattan
     }
 
     // A* search to solve the puzzle
@@ -47,11 +55,13 @@ public class Puzzle {
         // create the start state with g = 0 and heuristic value (h(n))
         State startState = new State(currentState, 0, calculateSumOfError(currentState));
         openList.add(startState); // add start state to the openList
+        nodesGenerated++;
 
         // loop until a solution is found or no more states are available to explore
         while (!openList.isEmpty()) {
 
             State current = openList.poll(); // get the current state that has the lowest cost (g + h)
+            nodesExpanded++;
             closedList.add(current); // mark the state as explored
 
             // want to check if the current state is the actual goal state
@@ -88,11 +98,15 @@ public class Puzzle {
         // explored yet
         for (State neighbor : neighbors) {
 
-            if (!closedList.contains(neighbors)) {
+            if (!closedList.contains(neighbor)) {
                 openList.add(neighbor);
+                nodesGenerated++;
             }
 
         }
+
+        // after getting the neighbors, add them to the closed List
+        // closedList.add(current);
 
     }
 
@@ -122,7 +136,7 @@ public class Puzzle {
 
         // find all the postions of the empty cell -> empty cell has a value of 0
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; i < 3; j++) {
+            for (int j = 0; j < 3; j++) {
                 if (board[i][j] == 0) {
 
                     zeroX = i;
@@ -148,6 +162,7 @@ public class Puzzle {
             // with teh updated board a new state has to be created, with the incremented
             // cost and heurisitic
             moves.add(new State(newBoard, current.g + 1, calculateSumOfError(newBoard), current));
+            nodesGenerated++;
 
         }
 
@@ -158,26 +173,40 @@ public class Puzzle {
     // this method will calculate the heuristic (Manhattan distance) for the A*
 
     private int calculateSumOfError(int[][] board) {
+        /*
+         * int heurisitic = 0;
+         * 
+         * // calculate the Manhattan Distance for each tile
+         * for (int i = 0; i < 3; i++) {
+         * for (int j = 0; j < 3; j++) {
+         * int value = board[i][j];
+         * 
+         * if (value != 0) {
+         * 
+         * int targetX = (value - 1) / 3; // Target is the row for this value
+         * int targetY = (value - 1) % 3; // Target is the column for this value
+         * heurisitic += Math.abs(i - targetX) + Math.abs(j - targetY); // this is the
+         * sum of the verticle and
+         * // horizontial values
+         * 
+         * }
+         * }
+         * }
+         * 
+         * return heurisitic;
+         */
 
-        int heurisitic = 0;
+        int misplaced = 0;
 
-        // calculate the Manhattan Distance for each tile
+        // count tiles that arent in their target postition
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                int value = board[i][j];
-
-                if (value != 0) {
-
-                    int targetX = (value - 1) / 3; // Target is the row for this value
-                    int targetY = (value - 1) % 3; // Target is the column for this value
-                    heurisitic += Math.abs(i - targetX) + Math.abs(j - targetY); // this is the sum of the verticle and
-                                                                                 // horizontial values
-
+                if (board[i][j] != 0 && board[i][j] != goalState[i][j]) {
+                    misplaced++;
                 }
             }
         }
-
-        return heurisitic;
+        return misplaced;
 
     }
 
@@ -206,6 +235,8 @@ public class Puzzle {
         }
 
         System.out.println("Number of takin steps: " + (path.size() - 1)); // this shows the numbers of steps required
+        System.out.println("Nodes generated: " + nodesGenerated);
+        System.out.println("Nodes expanded: " + nodesExpanded);
 
     }
 
@@ -214,7 +245,7 @@ public class Puzzle {
 
         for (int[] row : board) {
             for (int value : row) {
-                System.out.println(value + "");
+                System.out.print(value + " ");
             }
 
             System.out.println();
@@ -285,6 +316,11 @@ class State {
         State state = (State) obj;
         return Arrays.deepEquals(board, state.board);
 
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
     }
 
 }
