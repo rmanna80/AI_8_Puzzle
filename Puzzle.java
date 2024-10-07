@@ -44,9 +44,11 @@ public class Puzzle {
 
             }
         }
-        System.out.println("Eneter '1' to use the Manhattan Distance or '2' to use Misplaced tiles heuristic ");
+
+        System.out.println("Enter '1' to use the Manhattan Distance or '2' to use Misplaced tiles heuristic ");
         int choice = scanner.nextInt();
         useManhattan = (choice == 1); // if the input is '1' then use manhattan
+
     }
 
     // A* search to solve the puzzle
@@ -78,7 +80,7 @@ public class Puzzle {
         }
 
         // at the end if no solution was found print
-        System.out.println("Sorry but there was no solution found");
+        System.out.println("No Solution found");
 
     }
 
@@ -173,44 +175,44 @@ public class Puzzle {
     // this method will calculate the heuristic (Manhattan distance) for the A*
 
     private int calculateSumOfError(int[][] board) {
-        /*
-         * int heurisitic = 0;
-         * 
-         * // calculate the Manhattan Distance for each tile
-         * for (int i = 0; i < 3; i++) {
-         * for (int j = 0; j < 3; j++) {
-         * int value = board[i][j];
-         * 
-         * if (value != 0) {
-         * 
-         * int targetX = (value - 1) / 3; // Target is the row for this value
-         * int targetY = (value - 1) % 3; // Target is the column for this value
-         * heurisitic += Math.abs(i - targetX) + Math.abs(j - targetY); // this is the
-         * sum of the verticle and
-         * // horizontial values
-         * 
-         * }
-         * }
-         * }
-         * 
-         * return heurisitic;
-         */
+        
+          int heurisitic = 0;
+          
+          // calculate the Manhattan Distance for each tile
+          for (int i = 0; i < 3; i++) {
+          for (int j = 0; j < 3; j++) {
+          int value = board[i][j];
+          
+          if (value != 0) {
+          
+          int targetX = (value - 1) / 3; // Target is the row for this value
+          int targetY = (value - 1) % 3; // Target is the column for this value
+          heurisitic += Math.abs(i - targetX) + Math.abs(j - targetY); // this is the
+          //sum of the verticle and
+          // horizontial values
+          
+          }
+          }
+         }
+          
+          
+         
 
-        int misplaced = 0;
+        // int misplaced = 0;
 
-        // count tiles that arent in their target postition
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                if (board[i][j] != 0 && board[i][j] != goalState[i][j]) {
-                    misplaced++;
-                }
-            }
-        }
-        return misplaced;
+        // // count tiles that arent in their target postition
+        // for (int i = 0; i < 3; i++) {
+        //     for (int j = 0; j < 3; j++) {
+        //         if (board[i][j] != 0 && board[i][j] != goalState[i][j]) {
+        //             misplaced++;
+        //         }
+        //     }
+        // }
+        return heurisitic;
 
     }
 
-    // print the solution oath that is from the start state to the goal state
+    // print the solution path that is from the start state to the goal state
     private void printSolution(State goalState) {
 
         List<int[][]> path = new ArrayList<>();
